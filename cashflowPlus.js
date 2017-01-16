@@ -80,6 +80,64 @@ function findFinishData(ratesH){
 //         db.cashflow.insert({"Date": cashData, "Byr": Byr, "Byn": Byn, "Usd": Usd});
 // }
 
+function calculateCashDelta(nowTimeDay){
+    // cashbox is a result of the daily transactions
+    // let cashboxA = [];
+    // let cashboxA[0] = Byr, cashboxA[1] = Byn, cashboxA[2] = USD
+    var nowData = new Date();
+    nowData.setTime(nowTimeDay*1000*60*60*24);
+    var cashboxA = [];//0 - Byr, 1 - Byn, 2 - USD
+    cashboxA[0] = 0; cashboxA[1] = 0; cashboxA[2] = 0;
+    var i = 0,
+    TypeA = [],
+    OperationNameA = [],
+    AmountA = [],
+    CurrencyA = [],
+    cursor = db.transactions.find({"Date": nowData}),
+    length;
+        cursor.forEach(
+            function(obj){
+                TypeA[i] = obj.Type;// we find certain field of the certain transaction
+                OperationNameA[i] = obj.OperationName;
+                AmountA[i] = obj.Amount;
+                CurrencyA[i] = obj.Currency;
+                i++;
+            }
+        );
+        length = TypeA.length;
+        if(length>0){
+            for(var j = 0; j<length; j++){
+                switch(CurrencyA[j]){
+                    case "Byr":
+                        if(TypeA[j] === "Exp"){
+                            cashboxA[0] = cashboxA[0] - AmountA[j];
+                        }
+                        else{
+                            cashboxA[0] = cashboxA[0] + AmountA[j];
+                        };
+                        break;
+                    case "Byn":
+                        if(TypeA[j] === "Exp"){
+                            cashboxA[1] = cashboxA[1] - AmountA[j];
+                        }
+                        else{
+                            cashboxA[1] = cashboxA[1] + AmountA[j];
+                        };
+                        break;
+                    case "Usd":
+                       if(TypeA[j] === "Exp"){
+                            cashboxA[2] = cashboxA[2] - AmountA[j];
+                        }
+                        else{
+                            cashboxA[2] = cashboxA[2] + AmountA[j];
+                        }; 
+                }
+            }
+
+        }
+        return cashboxA;
+}
+
 function readCashFlow(nowTimeDay){
     var cashData  = new Date();
     var cursor;
@@ -163,7 +221,20 @@ function exchange(nowTimeDay, ratesH, amount, fromCurrency, toCurrency, Byr, Byn
 //     }
 // }
 
-function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
+function makeExchangeTransaction(nowTimeDay, Type, Category, Name, Amount, Currency, Account){
+    var Date = new Date();
+    Date.setTime(nowTimeDay*1000*60*60*24);// Data is in standard format
+    var Type = Type;
+    var Category = Category; 
+    var Name = Name; 
+    var Currency = Currency;
+    var Account = Account;
+    db.transactions.insert({"Date": Date, "Type": Type, "Category": Category, "Name": Name,
+                           "Amount": Amount, "Currency": Currency, "Account": Account});
+}// we insert document into the collection
+}
+
+function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     var exchangeResultA = []; // we store the result of the exchange function
     var weNeedByr;// we need Byr to compensate the -Usd
     var weTakeByr;// we take all money to compensate a part of -Usd
@@ -174,7 +245,7 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
     var rate = ratesH.rateInDays[nowTimeDay]; // rate for the nowTimeDay
     
     
-    /*if((Byr > 0) && (Usd < 0)){
+    if((Byr > 0) && (Usd < 0)){
         print("##day is = " + nowTimeDay);
         print("Byr is = " + Byr);
         weNeedByr = Math.round(-Usd*rate);
@@ -182,8 +253,12 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
         if(Byr >= weNeedByr){
             // we have enough money for compensate -Usd
             exchangeResultA = exchange(nowTimeDay, ratesH, weNeedByr, "Byr", "Usd");
-            updateCashFlow(nowTimeDay, finishTimeDay, exchangeResultA);
-            // we update cashflow from the cycleTimeDay to the finishTimeDay
+            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
+            // expense transaction Byr
+            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
+            // incoming transaction Usd
         }
         
         if(Byr < weNeedByr){
@@ -191,11 +266,15 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
             weTakeByr = Byr; // we take all Byr money
             // how many Usd we have if we sell all Byr
             exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByr, "Byr", "Usd");
-            updateCashFlow(nowTimeDay, finishTimeDay, exchangeResultA);
-            // we update cashflow from the cycleTimeDay to the finishTimeDay
+            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
+            // expense transaction Byr
+            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
+            // incoming transaction Usd
         }
         
-    }*/
+    }
 
     if ((Byr < 0) && (Usd > 0)){
         print("##day is = " + nowTimeDay);
@@ -205,10 +284,12 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
         if(Usd >= weNeedUsd){
             // we have enough money for compensate -Byr
             exchangeResultA = exchange(nowTimeDay, ratesH, weNeedUsd, "Usd", "Byr");
-            makeExchangeTransaction(nowTimeDay, exchangeResultA);
-            // expense transaction
-            makeExchangeTransaction(nowTimeDay, )
-            // incoming transaction
+            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
+            // expense transaction Usd
+            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
+            // incoming transaction Byr
         }
 
         if(Usd < weNeedUsd){
@@ -217,8 +298,12 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
             weHaveByr = Math.round(weTakeUsd * rate);
             // how many Byr we have if we sell all Usd
             exchangeResultA = exchange(nowTimeDay, ratesH, weTakeUsd, "Usd", "Byr");
-            updateCashFlow(nowTimeDay, finishTimeDay, exchangeResultA);
-            // we update cashflow from the cycleTimeDay to the finishTimeDay
+            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
+            // expense transaction Usd
+            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
+            // incoming transaction Byr
         }
         //// WE NEED TO WRITE THE SAME CODE FOR THE BYN AND USD!!!
     }
@@ -236,7 +321,7 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
     //startTimeDay = 14610
     //finishTimeDay = 17130
     // number of the days is finishTimeDay-startTimeDay+1 = 2521
-    var flowcashboxA = []; // flowcashboxA is the global cashbox, it is the cashflow
+    // var flowcashboxA = []; // flowcashboxA is the global cashbox, it is the cashflow
     flowcashboxA[0] = 0; flowcashboxA[1] = 0; flowcashboxA[2] = 0;
     // let cashboxA[0] = Byr, cashboxA[1] = Byn, cashboxA[2] = Usd
     var cashboxA = []; // we store the result of calculateCashDelta in it
@@ -247,7 +332,7 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
         
         dayCashboxA = readCashFlow(cycleTimeDay);
         // dayCashboxA[0] = Byr; dayCashboxA[1] = Byn; dayCashboxA[2] = Usd;
-        ifWeNeedExchange(cycleTimeDay, finishTimeDay, ratesH, dayCashboxA[0], dayCashboxA[1], dayCashboxA[2]); // I have no idea to use it
+        ifWeNeedExchange(cycleTimeDay, ratesH, dayCashboxA[0], dayCashboxA[1], dayCashboxA[2]); // I have no idea to use it
 
         // flowcashboxA has an actual amount of money on the cycleTimeDay
         // writeCashFlow(cycleTimeDay, flowcashboxA[0], flowcashboxA[1], flowcashboxA[2]);
