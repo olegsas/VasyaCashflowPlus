@@ -74,11 +74,11 @@ function findFinishData(ratesH){
 }
 
 
-function writeCashFlow(nowTimeDay, Byr, Byn, Usd){// we write the cashflow for the nowTimeDay
-    var cashData  = new Date();
-        cashData.setTime(nowTimeDay*1000*60*60*24);
-        db.cashflow.insert({"Date": cashData, "Byr": Byr, "Byn": Byn, "Usd": Usd});
-}
+// function writeCashFlow(nowTimeDay, Byr, Byn, Usd){// we write the cashflow for the nowTimeDay
+//     var cashData  = new Date();
+//         cashData.setTime(nowTimeDay*1000*60*60*24);
+//         db.cashflow.insert({"Date": cashData, "Byr": Byr, "Byn": Byn, "Usd": Usd});
+// }
 
 function readCashFlow(nowTimeDay){
     var cashData  = new Date();
@@ -136,32 +136,32 @@ function exchange(nowTimeDay, ratesH, amount, fromCurrency, toCurrency, Byr, Byn
     return exchangeResultA;
 }
 
-function updatingCashFlow(nowTimeDay, Byr, Byn, Usd){// we updating the line of the cashflow
-    var cashData  = new Date();
-    cashData.setTime(nowTimeDay*1000*60*60*24);
-    print("-----------Date is " + cashData);
-    db.cashflow.replaceOne({"Date": cashData},{"Date": cashData, "Byr": Byr, "Byn": Byn, "Usd": Usd});
-}
+// function updatingCashFlow(nowTimeDay, Byr, Byn, Usd){// we updating the line of the cashflow
+//     var cashData  = new Date();
+//     cashData.setTime(nowTimeDay*1000*60*60*24);
+//     print("-----------Date is " + cashData);
+//     db.cashflow.replaceOne({"Date": cashData},{"Date": cashData, "Byr": Byr, "Byn": Byn, "Usd": Usd});
+// }
 
-function updateCashFlow(cycleTimeDay, finishTimeDay, exchangeResultA){
-    var Byr, Byn, Usd; // values we want to update
-    var dayCashboxA = []; // we store the result of readCashFlow
-    var dayCashUpdateA = []; // we calculate what to store in the updated cashflow lines
-    Byr = exchangeResultA[3] - exchangeResultA[0]; // toByr - fromByr
-    Byn = exchangeResultA[4] - exchangeResultA[1]; // toByn - fromByn
-    Usd = exchangeResultA[5] - exchangeResultA[2]; // toUsd - fromUsd
-    for(var i = cycleTimeDay; i <= finishTimeDay; i++){
-        dayCashboxA = readCashFlow(i);
-        dayCashUpdateA[0] = dayCashboxA[0] + Byr;
-        dayCashUpdateA[1] = dayCashboxA[1] + Byn;
-        dayCashUpdateA[2] = dayCashboxA[2] + Usd;
-        print("##i= " + i);
-        print("##dayCashUpdateA[0]" + dayCashUpdateA[0]);
-        print("##dayCashUpdateA[1]" + dayCashUpdateA[1]);
-        print("##dayCashUpdateA[2]" + dayCashUpdateA[2]);
-        updatingCashFlow(i, dayCashUpdateA[0], dayCashUpdateA[1], dayCashUpdateA[2]);
-    }
-}
+// function updateCashFlow(cycleTimeDay, finishTimeDay, exchangeResultA){
+//     var Byr, Byn, Usd; // values we want to update
+//     var dayCashboxA = []; // we store the result of readCashFlow
+//     var dayCashUpdateA = []; // we calculate what to store in the updated cashflow lines
+//     Byr = exchangeResultA[3] - exchangeResultA[0]; // toByr - fromByr
+//     Byn = exchangeResultA[4] - exchangeResultA[1]; // toByn - fromByn
+//     Usd = exchangeResultA[5] - exchangeResultA[2]; // toUsd - fromUsd
+//     for(var i = cycleTimeDay; i <= finishTimeDay; i++){
+//         dayCashboxA = readCashFlow(i);
+//         dayCashUpdateA[0] = dayCashboxA[0] + Byr;
+//         dayCashUpdateA[1] = dayCashboxA[1] + Byn;
+//         dayCashUpdateA[2] = dayCashboxA[2] + Usd;
+//         print("##i= " + i);
+//         print("##dayCashUpdateA[0]" + dayCashUpdateA[0]);
+//         print("##dayCashUpdateA[1]" + dayCashUpdateA[1]);
+//         print("##dayCashUpdateA[2]" + dayCashUpdateA[2]);
+//         updatingCashFlow(i, dayCashUpdateA[0], dayCashUpdateA[1], dayCashUpdateA[2]);
+//     }
+// }
 
 function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
     var exchangeResultA = []; // we store the result of the exchange function
@@ -205,8 +205,10 @@ function ifWeNeedExchange(nowTimeDay, finishTimeDay, ratesH, Byr, Byn, Usd){
         if(Usd >= weNeedUsd){
             // we have enough money for compensate -Byr
             exchangeResultA = exchange(nowTimeDay, ratesH, weNeedUsd, "Usd", "Byr");
-            updateCashFlow(nowTimeDay, finishTimeDay, exchangeResultA);
-            // we update cashflow from the cycleTimeDay to the finishTimeDay
+            makeExchangeTransaction(nowTimeDay, exchangeResultA);
+            // expense transaction
+            makeExchangeTransaction(nowTimeDay, )
+            // incoming transaction
         }
 
         if(Usd < weNeedUsd){
