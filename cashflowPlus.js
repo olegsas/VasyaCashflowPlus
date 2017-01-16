@@ -231,7 +231,7 @@ function makeExchangeTransaction(nowTimeDay, Type, Category, Name, Amount, Curre
     var Account = Account;
     db.transactions.insert({"Date": Date, "Type": Type, "Category": Category, "Name": Name,
                            "Amount": Amount, "Currency": Currency, "Account": Account});
-}// we insert document into the collection
+// we insert document into the collection
 }
 
 function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
