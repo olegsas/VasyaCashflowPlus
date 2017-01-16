@@ -171,14 +171,14 @@ function exchange(nowTimeDay, ratesH, amount, fromCurrency, toCurrency, Byr, Byn
 }
 
 function makeExchangeTransaction(nowTimeDay, Type, Category, Name, Amount, Currency, Account){
-    var Date = new Date();
-    Date.setTime(nowTimeDay*1000*60*60*24);// Data is in standard format
+    var exchangeDate = new Date();
+    exchangeDate.setTime(nowTimeDay*1000*60*60*24);// Data is in standard format
     var Type = Type;
     var Category = Category; 
     var Name = Name; 
     var Currency = Currency;
     var Account = Account;
-    db.transactions.insert({"Date": Date, "Type": Type, "Category": Category, "Name": Name,
+    db.transactions.insert({"Date": exchangeDate, "Type": Type, "Category": Category, "Name": Name,
                            "Amount": Amount, "Currency": Currency, "Account": Account});
 // we insert document into the collection
 }
