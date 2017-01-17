@@ -293,7 +293,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
                 // we have not enough money, we will sell all Byr
                 weTakeByn = Byn; // we take all Byr money
                 // how many Usd we have if we sell all Byr
-                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByr, "Byn", "Usd");
+                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByn, "Byn", "Usd");
                 // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
                 // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
                 makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "BynUsd", exchangeResultA[1], "Byn", "PurseByn");
