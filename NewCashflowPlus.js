@@ -1,3 +1,5 @@
+const DATE_OF_DENOMINATION = new Date("2016-07-01");//the date of denomination, the constants
+const DAY_OF_DENOMINATION = Math.floor(DATE_OF_DENOMINATION.getTime()/(1000*60*60*24));// we find a day since zero point
 function standartDate(anyDay){// this function normalize string date into a Date object
 
     var anyDayA = anyDay.split("/");// we have got an array of 3 numbers in a string type
@@ -200,71 +202,143 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     var weNeedUsd; // we need Usd to compensate the -Byr
     var weTakeUsd; // we take all money to compensate a part of -Byr
     var weHaveByr; // we buy this money when we sell "weTakeUsd" money
+    var weNeedByn; 
+    var weTakeByn;
+    var weHaveByn;
     var rate = ratesH.rateInDays[nowTimeDay]; // rate for the nowTimeDay
     
     
-    if((Byr > 0) && (Usd < 0)){
-        print("##day is = " + nowTimeDay);
-        print("Byr is = " + Byr);
-        weNeedByr = Math.round(-Usd*rate);
-        // money for compensate -Usd
-        if(Byr >= weNeedByr){
-            // we have enough money for compensate -Usd
-            exchangeResultA = exchange(nowTimeDay, ratesH, weNeedByr, "Byr", "Usd");
-            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
-            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
-            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
-            // expense transaction Byr
-            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
-            // incoming transaction Usd
-        }
-        
-        if(Byr < weNeedByr){
-            // we have not enough money, we will sell all Byr
-            weTakeByr = Byr; // we take all Byr money
-            // how many Usd we have if we sell all Byr
-            exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByr, "Byr", "Usd");
-            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
-            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
-            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
-            // expense transaction Byr
-            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
-            // incoming transaction Usd
-        }
-        
-    }
-
-    if ((Byr < 0) && (Usd > 0)){
-        print("##day is = " + nowTimeDay);
-        print("Usd is = " + Usd);
-        weNeedUsd = Math.round(-Byr / rate);
-        // money for compensate -Byr
-        if(Usd >= weNeedUsd){
-            // we have enough money for compensate -Byr
-            exchangeResultA = exchange(nowTimeDay, ratesH, weNeedUsd, "Usd", "Byr");
-            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
-            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
-            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
-            // expense transaction Usd
-            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
-            // incoming transaction Byr
+    if(nowTimeDay < DAY_OF_DENOMINATION){
+        if((Byr > 0) && (Usd < 0)){
+            print("##day is = " + nowTimeDay);
+            print("Byr is = " + Byr);
+            weNeedByr = Math.round(-Usd*rate);
+            // money for compensate -Usd
+            if(Byr >= weNeedByr){
+                // we have enough money for compensate -Usd
+                exchangeResultA = exchange(nowTimeDay, ratesH, weNeedByr, "Byr", "Usd");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
+                // expense transaction Byr
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
+                // incoming transaction Usd
+            }
+            
+            if(Byr < weNeedByr){
+                // we have not enough money, we will sell all Byr
+                weTakeByr = Byr; // we take all Byr money
+                // how many Usd we have if we sell all Byr
+                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByr, "Byr", "Usd");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "ByrUsd", exchangeResultA[0], "Byr", "PurseByr");
+                // expense transaction Byr
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "ByrUsd", exchangeResultA[5], "Usd", "SafeUsd");
+                // incoming transaction Usd
+            }
+            
         }
 
-        if(Usd < weNeedUsd){
-            // we have not enough money, we will sell all Usd
-            weTakeUsd = Usd; // we take all Usd money
-            weHaveByr = Math.round(weTakeUsd * rate);
-            // how many Byr we have if we sell all Usd
-            exchangeResultA = exchange(nowTimeDay, ratesH, weTakeUsd, "Usd", "Byr");
-            // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
-            // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
-            makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
-            // expense transaction Usd
-            makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
-            // incoming transaction Byr
+        if ((Byr < 0) && (Usd > 0)){
+            print("##day is = " + nowTimeDay);
+            print("Usd is = " + Usd);
+            weNeedUsd = Math.round(-Byr / rate);
+            // money for compensate -Byr
+            if(Usd >= weNeedUsd){
+                // we have enough money for compensate -Byr
+                exchangeResultA = exchange(nowTimeDay, ratesH, weNeedUsd, "Usd", "Byr");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
+                // expense transaction Usd
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
+                // incoming transaction Byr
+            }
+
+            if(Usd < weNeedUsd){
+                // we have not enough money, we will sell all Usd
+                weTakeUsd = Usd; // we take all Usd money
+                weHaveByr = Math.round(weTakeUsd * rate);
+                // how many Byr we have if we sell all Usd
+                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeUsd, "Usd", "Byr");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByr", exchangeResultA[2], "Usd", "SafeUsd");
+                // expense transaction Usd
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByr", exchangeResultA[3], "Byr", "PurseByr");
+                // incoming transaction Byr
+            }
         }
-        //// WE NEED TO WRITE THE SAME CODE FOR THE BYN AND USD!!!
     }
+    //// WE NEED TO WRITE THE SAME CODE FOR THE BYN AND USD!!!
+    if(nowTimeDay >= DAY_OF_DENOMINATION){
+        if((Byn > 0) && (Usd < 0)){
+            print("##day is = " + nowTimeDay);
+            print("Byn is = " + Byn);
+            weNeedByn = Math.round(-Usd*rate);
+            // money for compensate -Usd
+            if(Byn >= weNeedByn){
+                // we have enough money for compensate -Usd
+                exchangeResultA = exchange(nowTimeDay, ratesH, weNeedByn, "Byn", "Usd");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "BynUsd", exchangeResultA[1], "Byn", "PurseByn");
+                // expense transaction Byr
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "BynUsd", exchangeResultA[5], "Usd", "SafeUsd");
+                // incoming transaction Usd
+            }
+            
+            if(Byn < weNeedByn){
+                // we have not enough money, we will sell all Byr
+                weTakeByn = Byn; // we take all Byr money
+                // how many Usd we have if we sell all Byr
+                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeByr, "Byn", "Usd");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "BynUsd", exchangeResultA[1], "Byn", "PurseByn");
+                // expense transaction Byr
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "BynUsd", exchangeResultA[5], "Usd", "SafeUsd");
+                // incoming transaction Usd
+            }
+            
+        }
+
+        if ((Byn < 0) && (Usd > 0)){
+            print("##day is = " + nowTimeDay);
+            print("Usd is = " + Usd);
+            weNeedUsd = Math.round(-Byn / rate);
+            // money for compensate -Byr
+            if(Usd >= weNeedUsd){
+                // we have enough money for compensate -Byr
+                exchangeResultA = exchange(nowTimeDay, ratesH, weNeedUsd, "Usd", "Byn");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByn", exchangeResultA[2], "Usd", "SafeUsd");
+                // expense transaction Usd
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByn", exchangeResultA[4], "Byn", "PurseByn");
+                // incoming transaction Byr
+            }
+
+            if(Usd < weNeedUsd){
+                // we have not enough money, we will sell all Usd
+                weTakeUsd = Usd; // we take all Usd money
+                weHaveByn = Math.round(weTakeUsd * rate);
+                // how many Byr we have if we sell all Usd
+                exchangeResultA = exchange(nowTimeDay, ratesH, weTakeUsd, "Usd", "Byn");
+                // exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
+                // exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
+                makeExchangeTransaction(nowTimeDay, "Exp", "Exchange", "UsdByn", exchangeResultA[2], "Usd", "SafeUsd");
+                // expense transaction Usd
+                makeExchangeTransaction(nowTimeDay, "Inc", "Exchange", "UsdByn", exchangeResultA[4], "Byn", "PurseByn");
+                // incoming transaction Byr
+            }
+        }
+    }
+
+}
+
+function denominationExchange(cycleTimeDay, Byr, Byn){
 
 }
 
@@ -292,6 +366,11 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
         for(var i = 0; i < flowcashboxA.length; i++){
             preCashboxA[i] = flowcashboxA[i] + cashboxA[i];
             // we are calculating previously cashflow without exchange
+        }
+        if(cycleTimeDay === DAY_OF_DENOMINATION){
+            // we need to transfer Byr into Byn
+            denominationExchange(cycleTimeDay, preCashboxA[0], preCashboxA[1]);
+            // we generate exchange transactions from Byr to Byn
         }
         ifWeNeedExchange(cycleTimeDay, ratesH, preCashboxA[0], preCashboxA[1], preCashboxA[2]); // I have no idea to use it
         // we generate the exchange transactions if we need it
