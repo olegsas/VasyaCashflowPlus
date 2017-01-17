@@ -210,7 +210,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     
     if(nowTimeDay < DAY_OF_DENOMINATION){
         if((Byr > 0) && (Usd < 0)){
-            print("##day is = " + nowTimeDay);
+            print("We exchange Byr ##day is = " + nowTimeDay);
             print("Byr is = " + Byr);
             weNeedByr = Math.round(-Usd*rate);
             // money for compensate -Usd
@@ -241,7 +241,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
         }
 
         if ((Byr < 0) && (Usd > 0)){
-            print("##day is = " + nowTimeDay);
+            print("We exchange Usd ##day is = " + nowTimeDay);
             print("Usd is = " + Usd);
             weNeedUsd = Math.round(-Byr / rate);
             // money for compensate -Byr
@@ -274,7 +274,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     //// WE NEED TO WRITE THE SAME CODE FOR THE BYN AND USD!!!
     if(nowTimeDay >= DAY_OF_DENOMINATION){
         if((Byn > 0) && (Usd < 0)){
-            print("##day is = " + nowTimeDay);
+            print("We exchangr Byn ##day is = " + nowTimeDay);
             print("Byn is = " + Byn);
             weNeedByn = Math.round(-Usd*rate);
             // money for compensate -Usd
@@ -305,7 +305,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
         }
 
         if ((Byn < 0) && (Usd > 0)){
-            print("##day is = " + nowTimeDay);
+            print("We exchange Usd ##day is = " + nowTimeDay);
             print("Usd is = " + Usd);
             weNeedUsd = Math.round(-Byn / rate);
             // money for compensate -Byr
@@ -371,6 +371,8 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
             denominationExchange(cycleTimeDay, preCashboxA[0], preCashboxA[1]);
             // we generate exchange transactions from Byr to Byn
         }
+        print("cycleTimeDay ---------------------- " + cycleTimeDay);
+        
         ifWeNeedExchange(cycleTimeDay, ratesH, preCashboxA[0], preCashboxA[1], preCashboxA[2]); // I have no idea to use it
         // we generate the exchange transactions if we need it
         cashboxA = calculateCashDelta(cycleTimeDay);
