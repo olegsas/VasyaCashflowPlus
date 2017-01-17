@@ -28,7 +28,7 @@ function dataRates(){
         standartDateA[i] = standartDate(dataA[i]);
         
         timeDay = Math.floor(standartDateA[i].getTime()/(1000*60*60*24));// we find a day since zero point
-        rateInDaysA[timeDay] = rateA[i];
+        rateInDaysA[timeDay] = 1;//rateA[i];/////////////////////////////////////for debug only//////////////////////////
         // print("timeDay = " + timeDay);
         // print("rateInDaysA[timeDay] = "+ rateInDaysA[timeDay])
     }
