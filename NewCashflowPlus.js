@@ -338,7 +338,7 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
 
 }
 
-function denominationExchange(cycleTimeDay, Byr, Byn){
+function denominationExchange(nowTimeDay, Byr, Byn){
     var toByn = Math.floor(Byr / 10000); // we calculate the incomes, ignore if < 10000.
     var fromByr = toByn * 10000; // we take an integer fromByr
     makeExchangeTransaction(nowTimeDay, "Exp", "Denomination", "ByrByn", fromByr, "Byr", "PurseByr");
@@ -372,6 +372,8 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
             // we are calculating previously cashflow without exchange
         }
         if(cycleTimeDay === DAY_OF_DENOMINATION){
+            print("==================cycleTimeDay = " + cycleTimeDay);
+            print("=================DAY_OF_DENOMINATION = " + DAY_OF_DENOMINATION);
             // we need to transfer Byr into Byn
             denominationExchange(cycleTimeDay, preCashboxA[0], preCashboxA[1]);
             // we generate exchange transactions from Byr to Byn
