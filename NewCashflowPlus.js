@@ -162,13 +162,13 @@ function exchange(nowTimeDay, ratesH, amount, fromCurrency, toCurrency, Byr, Byn
     }
     exchangeResultA[0] = fromByr; exchangeResultA[1] = fromByn; exchangeResultA[2] = fromUsd;
     exchangeResultA[3] = toByr; exchangeResultA[4] = toByn; exchangeResultA[5] = toUsd;
-    print("fromByr = " + fromByr);
-    print("fromUsd = "+ fromUsd);
-    print("toByr = "+ toByr); 
-    print("toUsd = " + toUsd);
-    print("nowTimeDay = " + nowTimeDay);
-    print("amount = "+ amount);
-    print("rate = " + rate);
+    // print("fromByr = " + fromByr);
+    // print("fromUsd = "+ fromUsd);
+    // print("toByr = "+ toByr); 
+    // print("toUsd = " + toUsd);
+    // print("nowTimeDay = " + nowTimeDay);
+    // print("amount = "+ amount);
+    // print("rate = " + rate);
     return exchangeResultA;
 }
 
@@ -182,15 +182,15 @@ function makeExchangeTransaction(nowTimeDay, Type, Category, Name, Amount, Curre
     var Account = Account;
     db.transactions.insert({"Date": exchangeDate, "Type": Type, "Category": Category, "Name": Name,
                            "Amount": Amount, "Currency": Currency, "Account": Account});
-    print("start insert");
-    print("Date = " + exchangeDate);
-    print("Type = " + Type);
-    print("Category = " + Category);
-    print("Name = " + Name);
-    print("Amount = " + Amount);
-    print("Currency = " + Currency);
-    print("Account = " + Account);
-    print("finish insert");
+    // print("start insert");
+    // print("Date = " + exchangeDate);
+    // print("Type = " + Type);
+    // print("Category = " + Category);
+    // print("Name = " + Name);
+    // print("Amount = " + Amount);
+    // print("Currency = " + Currency);
+    // print("Account = " + Account);
+    // print("finish insert");
 // we insert document into the collection
 }
 
@@ -210,8 +210,8 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     
     if(nowTimeDay < DAY_OF_DENOMINATION){
         if((Byr > 0) && (Usd < 0)){
-            print("We exchange Byr ##day is = " + nowTimeDay);
-            print("Byr is = " + Byr);
+            // print("We exchange Byr ##day is = " + nowTimeDay);
+            // print("Byr is = " + Byr);
             weNeedByr = Math.round(-Usd*rate);
             // money for compensate -Usd
             if(Byr >= weNeedByr){
@@ -241,8 +241,8 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
         }
 
         if ((Byr < 0) && (Usd > 0)){
-            print("We exchange Usd ##day is = " + nowTimeDay);
-            print("Usd is = " + Usd);
+            // print("We exchange Usd ##day is = " + nowTimeDay);
+            // print("Usd is = " + Usd);
             weNeedUsd = Math.round(-Byr / rate);
             // money for compensate -Byr
             if(Usd >= weNeedUsd){
@@ -274,8 +274,8 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
     //// WE NEED TO WRITE THE SAME CODE FOR THE BYN AND USD!!!
     if(nowTimeDay >= DAY_OF_DENOMINATION){
         if((Byn > 0) && (Usd < 0)){
-            print("We exchangr Byn ##day is = " + nowTimeDay);
-            print("Byn is = " + Byn);
+            // print("We exchangr Byn ##day is = " + nowTimeDay);
+            // print("Byn is = " + Byn);
             weNeedByn = Math.round(-Usd*rate);
             // money for compensate -Usd
             if(Byn >= weNeedByn){
@@ -305,8 +305,8 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
         }
 
         if ((Byn < 0) && (Usd > 0)){
-            print("We exchange Usd ##day is = " + nowTimeDay);
-            print("Usd is = " + Usd);
+            // print("We exchange Usd ##day is = " + nowTimeDay);
+            // print("Usd is = " + Usd);
             weNeedUsd = Math.round(-Byn / rate);
             // money for compensate -Byr
             if(Usd >= weNeedUsd){
@@ -372,13 +372,13 @@ function runCashFlowPLus(begin, end){// we want to use day from the begining Day
             // we are calculating previously cashflow without exchange
         }
         if(cycleTimeDay === DAY_OF_DENOMINATION){
-            print("==================cycleTimeDay = " + cycleTimeDay);
-            print("=================DAY_OF_DENOMINATION = " + DAY_OF_DENOMINATION);
+            // print("==================cycleTimeDay = " + cycleTimeDay);
+            // print("=================DAY_OF_DENOMINATION = " + DAY_OF_DENOMINATION);
             // we need to transfer Byr into Byn
             denominationExchange(cycleTimeDay, preCashboxA[0], preCashboxA[1]);
             // we generate exchange transactions from Byr to Byn
         }
-        print("cycleTimeDay ---------------------- " + cycleTimeDay);
+        // print("cycleTimeDay ---------------------- " + cycleTimeDay);
         
         ifWeNeedExchange(cycleTimeDay, ratesH, preCashboxA[0], preCashboxA[1], preCashboxA[2]); // I have no idea to use it
         // we generate the exchange transactions if we need it
