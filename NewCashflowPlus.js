@@ -339,7 +339,12 @@ function ifWeNeedExchange(nowTimeDay, ratesH, Byr, Byn, Usd){
 }
 
 function denominationExchange(cycleTimeDay, Byr, Byn){
-
+    var toByn = Math.floor(Byr / 10000); // we calculate the incomes, ignore if < 10000.
+    var fromByr = toByn * 10000; // we take an integer fromByr
+    makeExchangeTransaction(nowTimeDay, "Exp", "Denomination", "ByrByn", fromByr, "Byr", "PurseByr");
+    // expense transaction Byr
+    makeExchangeTransaction(nowTimeDay, "Inc", "Denomination", "ByrByn", toByn, "Byn", "PurseByn");
+    // incoming transaction Byn
 }
 
 function runCashFlowPLus(begin, end){// we want to use day from the begining Day 1970
